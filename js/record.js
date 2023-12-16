@@ -1,30 +1,35 @@
-import { getGameTime, getSessionUser } from "./storage.js"
+import { getDifficultyMode, getGameTime, getSessionUser } from "./storage.js"
 
 export class Record {
     username
     result
     mode
     timeout
+    difficulty
 
-    constructor(username, result, mode, timeout) {
+    constructor(username, result, mode, timeout, difficulty) {
         this.username = username
         this.result = result
         this.mode = mode
         this.timeout = timeout
+        this.difficulty = difficulty
     }
 }
 
 export function saveRecord(mode, record) {
     const records = getRecords()
     const user = getSessionUser()
-    const newRecord = new Record(user, record, mode, getGameTime())
+    const newRecord = new Record(user, record, mode, getGameTime(), getDifficultyMode())
     records.push(newRecord)
     localStorage.setItem('history', JSON.stringify(records))
 }
 
 export function getRecord(mode, user) {
     const records = getRecords()
-    const targetRecords = records.filter(val => val.username === user && val.mode === mode)
+    const difficulty = getDifficultyMode()
+    const targetRecords = records.filter(val => { 
+        return val.username === user && val.mode === mode && val.difficulty === difficulty
+    })
     if (targetRecords.length === 0) {
         return 0
     }

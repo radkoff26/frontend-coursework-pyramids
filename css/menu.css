@@ -79,10 +79,20 @@
     border-bottom-color: #000;
 }
 
-.relogin {
+.account-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
     position: fixed;
     right: 16px;
     top: 16px;
+}
+
+.account-container .user-name {
+    font-size: 20px;
+}
+
+.account-container .relogin {
     border: 1px solid #000;
     border-radius: 16px;
     font-size: 20px;
@@ -92,7 +102,7 @@
     cursor: pointer;
 }
 
-.relogin:hover {
+.account-container .relogin:hover {
     background-color: #eee;
 }
 

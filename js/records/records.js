@@ -1,3 +1,4 @@
+import { Difficulty, DifficultyMap } from "../game/difficulty.js"
 import { Mode, ModeMap } from "../game/mode.js"
 import { getAllRecordsByMode } from "../record.js"
 import stringifySeconds from "../time.js"
@@ -5,7 +6,9 @@ import stringifySeconds from "../time.js"
 const switches = document.querySelector('.records-modes-switch')
 const recordsElement = document.querySelector('.records')
 const homeButton = document.querySelector('.home')
+const difficultySelect = document.querySelector('#difficulty')
 let selectedMode = Mode.Static
+let selectedDifficulty = Difficulty.Easy
 
 function initialDraw() {
     for (const [key, mode] of ModeMap) {
@@ -15,16 +18,34 @@ function initialDraw() {
             if (!mode) {
                 return
             }
-            selectMode(mode)
+            selectMode(mode, selectedDifficulty)
         })
         if (key === selectedMode) {
             modeSwitch.classList.add('selected')
         }
     }
-    selectMode(selectedMode)
+    selectMode(selectedMode, selectedDifficulty)
     homeButton.addEventListener('click', () => {
         location.href = '..'
     })
+    DifficultyMap.forEach((value, key) => {
+        const option = buildOption(key, value)
+        if (key === selectedDifficulty) {
+            option.selected = true
+        }
+        difficultySelect.appendChild(option)
+    })
+    difficultySelect.addEventListener('change', () => {
+        const difficulty = difficultySelect.value
+        selectMode(selectedMode, difficulty)
+    })
+}
+
+function buildOption(value, text) {
+    const option = document.createElement('option')
+    option.value = value
+    option.innerText = text
+    return option
 }
 
 function renderSwitch(key, mode) {
@@ -36,26 +57,29 @@ function renderSwitch(key, mode) {
     return modeSwitch
 }
 
-function selectMode(mode) {
+function selectMode(mode, difficulty) {
     selectedMode = mode
+    selectedDifficulty = difficulty
     for (const child of switches.children) {
         const childMode = child.getAttribute('data-key')
         child.classList.toggle('selected', childMode === mode)
     }
     recordsElement.innerHTML = ''
-    renderRecordsOfMode(mode)
+    renderRecordsOfMode(mode, difficulty)
 }
 
-function renderRecordsOfMode(mode) {
+function renderRecordsOfMode(mode, difficulty) {
     const records = getAllRecordsByMode(mode)
     const userSet = new Set()
     const recordsToDisplay = []
     records.forEach(record => {
         if (!userSet.has(record.username)) {
             const userRecords = records
-                .filter(val => val.username === record.username)
+                .filter(val => val.username === record.username && val.difficulty === difficulty)
                 .sort(recordsComparator)
-            recordsToDisplay.push(userRecords[0])
+            if (userRecords.length > 0) {
+                recordsToDisplay.push(userRecords[0])
+            }
         }
         userSet.add(record.username)
     })

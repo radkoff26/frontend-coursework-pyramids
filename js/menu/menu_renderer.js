@@ -59,6 +59,17 @@ function generateMenuElement(recordStatic, recordDynamic, recordResizing) {
     rulesLink.href = './pages/rules.html'
     rulesLink.innerText = 'Правила игры'
 
+    const settingsLink = document.createElement('a')
+    settingsLink.href = './pages/settings.html'
+    settingsLink.innerText = 'Настройки'
+
+    const accountContainer = document.createElement('div')
+    accountContainer.classList.add('account-container')
+
+    const userName = document.createElement('div')
+    userName.classList.add('user-name')
+    userName.innerText = `Игрок: ${getSessionUser()}`
+
     const relogin = document.createElement('div')
     relogin.classList.add('relogin')
     relogin.innerText = 'Сменить аккаунт'
@@ -77,8 +88,13 @@ function generateMenuElement(recordStatic, recordDynamic, recordResizing) {
     
     linksContainer.appendChild(recordsLink)
     linksContainer.appendChild(rulesLink)
+    linksContainer.appendChild(settingsLink)
     menu.appendChild(linksContainer)
-    menu.appendChild(relogin)
+
+    accountContainer.appendChild(userName)
+    accountContainer.appendChild(relogin)
+    menu.appendChild(accountContainer)
+
     menu.appendChild(header)
     menu.appendChild(staticGameButton)
     menu.appendChild(dynamicGameButton)

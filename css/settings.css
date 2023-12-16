@@ -1,0 +1,44 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.settings .setting label {
+    margin-right: 24px;
+}
+
+.settings .setting input[type='number'] {
+    outline: none;
+    border: 1px solid #000;
+    font-size: 20px;
+    border-radius: 16px;
+    padding: 8px;
+}
+
+.settings select {
+    font-size: 18px;
+}
+
+.settings .save {
+    width: 100%;
+    border: 1px solid #000;
+    border-radius: 16px;
+    background-color: #eee;
+    transition: .5s;
+    padding: 8px 16px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.settings .save:hover {
+    background-color: #ddd;
+}

@@ -85,3 +85,15 @@ body {
     font-size: 20px;
     font-weight: 600;
 }
+
+.records-container .records .record .line .result {
+    font-size: 24px;
+}
+
+.filter {
+    padding: 16px;
+}
+
+.filter select {
+    font-size: 16px;
+}

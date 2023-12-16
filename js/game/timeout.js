@@ -9,6 +9,10 @@ export function startTimeoutFrom(duration, onTickCallback) {
     timeout = setTimeout(tick, 1000)
 }
 
+export function addTime(time) {
+    timeLeft += time
+}
+
 export function stopTimeout() {
     timeout && clearTimeout(timeout)
     timeout = null
