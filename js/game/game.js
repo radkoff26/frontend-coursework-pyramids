@@ -21,6 +21,7 @@ function startGame() {
             startResizingGame(new Store(), onBackPressed)
             break
     }
+    document.title = `Game ${mode}`
 }
 
 function onBackPressed() {

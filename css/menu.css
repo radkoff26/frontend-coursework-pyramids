@@ -58,17 +58,24 @@
 }
 
 /* Menu */
-a.to-records {
+.links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     position: fixed;
     top: 16px;
     left: 16px;
+}
+
+.links-container a {
+    width: fit-content;
     color: #000;
     font-size: 24px;
     border-bottom: 1px solid transparent;
     transition: border-bottom .5s;
 }
 
-a.to-records:hover {
+.links-container a:hover {
     border-bottom-color: #000;
 }
 

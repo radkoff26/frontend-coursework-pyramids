@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/rules.css">
+</head>
+<body>
+    <div class="rules-container">
+        <h1 class="title">Правила игры</h1>
+        <ul class="rules">
+            <li>
+                <div class="rule-title">Общее</div>
+                <div class="description">
+                    1. Каждое следующее устанавливаемое на пирамиду кольцо должно быть не больше последнего, 
+                    иначе игра будет окончена поражением.<br>
+                    2. За каждое установленное на пирамиду кольцо засчитывается определённое уровнем сложности 
+                    количество баллов и увеличивается оставшееся время к таймеру (кроме режима "Увеличительный").<br>
+                    3. В игре присутствует таймер, по истечении которого игра будет окончена.<br>
+                </div>
+            </li>
+            <li>
+                <div class="rule-title">Режим "Статический"</div>
+                <div class="description">
+                    Сверху пирамиды расположены кольца пирамиды. Перетягивайте кольца на пирамиду с помощью мыши.
+                    После установки кольца на пирамиду предлагаемые к установке кольца обновляются случайным образом.
+                </div>
+            </li>
+            <li>
+                <div class="rule-title">Режим "Динамический"</div>
+                <div class="description">
+                    Кольца появляются каждый промежуток времени и падают вниз. Ловите их, кликая по ним мышью - 
+                    они будут автоматически устанавливаться на пирамиду.
+                    Но следите за тем, чтобы не поставить более большое кольцо на более маленькое.
+                </div>
+            </li>
+            <li>
+                <div class="rule-title">Режим "Увеличительный"</div>
+                <div class="description">
+                    Подстройте ширину падающего на пирамиду кольца так, чтобы не нарушить правила. Для этого
+                    увеличивайте ширину кольца с помощью клика на кольцо или нажатием на клавишу "Пробел".
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="home"></div>
+    <script>
+        const homeButton = document.querySelector('.home')
+        homeButton.addEventListener('click', () => {
+            location.href = '..'
+        })
+    </script>
+</body>
+</html>

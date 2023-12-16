@@ -48,10 +48,16 @@ function generateMenuElement(recordStatic, recordDynamic, recordResizing) {
     const header = document.createElement('h1')
     header.innerText = 'Pyramids'
 
+    const linksContainer = document.createElement('div')
+    linksContainer.classList.add('links-container')
+
     const recordsLink = document.createElement('a')
-    recordsLink.classList.add('to-records')
     recordsLink.href = './pages/records.html'
     recordsLink.innerText = 'Рекорды'
+
+    const rulesLink = document.createElement('a')
+    rulesLink.href = './pages/rules.html'
+    rulesLink.innerText = 'Правила игры'
 
     const relogin = document.createElement('div')
     relogin.classList.add('relogin')
@@ -69,7 +75,9 @@ function generateMenuElement(recordStatic, recordDynamic, recordResizing) {
     resizingGameButton.setAttribute('data-mode', Mode.Resizing)
     resizingGameButton.innerHTML = `Режим "Увеличительный" <br> Рекорд: ${recordResizing}`
     
-    menu.appendChild(recordsLink)
+    linksContainer.appendChild(recordsLink)
+    linksContainer.appendChild(rulesLink)
+    menu.appendChild(linksContainer)
     menu.appendChild(relogin)
     menu.appendChild(header)
     menu.appendChild(staticGameButton)
