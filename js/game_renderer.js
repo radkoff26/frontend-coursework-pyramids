@@ -13,6 +13,10 @@ export function renderGameField(isGameOver) {
     const stand = document.createElement('div')
     stand.classList.add('stand')
 
+    const stick = document.createElement('div')
+    stick.classList.add('stick')
+    
+    stand.appendChild(stick)
     pyramid.appendChild(stand)
     game.appendChild(pyramid)
     document.body.insertAdjacentElement('beforeend', game)

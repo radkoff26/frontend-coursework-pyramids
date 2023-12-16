@@ -11,6 +11,9 @@ let gameStore = null
 let clockElement = null
 let onBackPressed = null
 let redraw = true
+let stickElement = null
+
+let movingRing = null
 
 const subscriber = new Subscriber(render)
 
@@ -28,7 +31,6 @@ export default function startStaticGame(store, onBackPressedCallback) {
     startTimeoutFrom(store.state.timeLeft, () => {
         store.dispatch(state => {
             const timeLeft = state.timeLeft - 1
-            console.log("Time left: ", timeLeft);
             const isGameOver = timeLeft === 0
             if (isGameOver) {
                 redraw = true
@@ -45,6 +47,7 @@ function render(state) {
         document.body.innerHTML = ''
         const gameField = renderGameField(state.isGameOver)
         clockElement = renderClock(state.timeLeft)
+        stickElement = gameField.querySelector('.stick')
         renderRecord(state.pyramidRings.length)
         renderPyramid(state, gameField)
         renderFloatingRings(state, gameField)
@@ -76,6 +79,11 @@ function stopGame() {
 
 function renderPyramid(state, gameField) {
     const pyramid = gameField.children[0]
+    const stand = pyramid.querySelector('.stand')
+    console.log(stand)
+    stand.addEventListener('dragenter', e => {
+        console.log('dragover')
+    })
     state.pyramidRings.slice(-5).forEach(ring => {
         renderRingOnPyramid(ring, pyramid)
     })
@@ -85,15 +93,80 @@ function renderFloatingRings(state, gameField) {
     state.floatingRings.forEach((ring) => {
         const element = renderRingElement(ring, gameField)
         if (!state.isGameOver) {
-            element.addEventListener('click', e => {
+            element.draggable = true
+            element.addEventListener('dragstart', e => {
+                e.preventDefault()
+                return false
+            })
+            element.addEventListener('mousedown', e => {
                 const index = e.target.getAttribute('data-index')
                 if (!index) {
                     return
                 }
-                putRingOnPyramid(Number.parseInt(index))
+                movingRing = e.target
+                movingRing.classList.toggle('moving', true)
+                let shiftX = e.clientX - movingRing.getBoundingClientRect().left;
+                let shiftY = e.clientY - movingRing.getBoundingClientRect().top;
+                function onMouseUp(e) {
+                    console.log('up start');
+                    if (!movingRing) {
+                        return
+                    }
+                    const ringIdString = movingRing.getAttribute('data-index')
+                    if (!ringIdString) {
+                        movingRing = null
+                        return
+                    }
+                    const ringId = Number.parseInt(ringIdString)
+                    if (elementIntersectsStick(movingRing)) {
+                        putRingOnPyramid(ringId)
+                    } else {
+                        if (gameStore) {
+                            redraw = true
+                            render(gameStore.state)
+                        }
+                    }
+                    movingRing.removeEventListener('mouseup', onMouseUp)
+                    document.removeEventListener('mousemove', onMouseMove)
+                    movingRing.classList.toggle('moving', false)
+                    movingRing = null
+                    console.log('up end');
+                }
+                function onMouseMove(e) {
+                    if (!movingRing) {
+                        return
+                    }
+                    movingRing.style.left = `${e.clientX - shiftX}px`
+                    movingRing.style.top = `${e.clientY - shiftY}px`
+                }
+                movingRing.addEventListener('mouseup', onMouseUp)
+                document.addEventListener('mousemove', onMouseMove)
             })
         }
     });
+}
+
+function elementIntersectsStick(element) {
+    const stickRect = stickElement.getClientRects()[0]
+    const elementRect = element.getClientRects()[0]
+    const intersectsX = rangesIntersect(stickRect.left, stickRect.right, elementRect.left, elementRect.right)
+    const intersectsY = rangesIntersect(stickRect.top, stickRect.bottom, elementRect.top, elementRect.bottom)
+    return intersectsX && intersectsY
+}
+
+function rangesIntersect(a1, b1, a2, b2) {
+    // First range
+    if (isPointInRange(a2, a1, b1) || isPointInRange(b2, a1, b1)) {
+        return true
+    }
+    if (isPointInRange(a1, a2, b2) || isPointInRange(b1, a2, b2)) {
+        return true
+    }
+    return false
+}
+
+function isPointInRange(x, a, b) {
+    return a <= x && b >= x
 }
 
 function putRingOnPyramid(ringId) {

@@ -38,6 +38,13 @@ export default function startResizingGame(store, onBackPressedCallback) {
             return {...state, timeLeft, isGameOver}
         })
     })
+    document.addEventListener('keyup', e => {
+        if (e.key === ' ') {
+            if (gameStore && !gameStore.state.isGameOver) {
+                growAllRingsSize()
+            }
+        }
+    })
     store.subscribe(subscriber)
     startMovingRing()
 }
@@ -199,6 +206,17 @@ function growRingSize(ringId) {
     const ringElement = document.querySelector(`[data-index="${ringId}"`)
     ringElement.style.width = `${puttingRing.width}%`
     ringElement.style.left = `${puttingRing.left}%`
+}
+
+function growAllRingsSize() {
+    const floatingRings = gameStore.state.floatingRings
+    floatingRings.forEach(val => {
+        val.width += 1
+        val.left = 50 - val.width / 2
+        const ringElement = document.querySelector(`[data-index="${val.id}"`)
+        ringElement.style.width = `${val.width}%`
+        ringElement.style.left = `${val.left}%`
+    })
 }
 
 function putRingOnPyramid(state, ringId) {
