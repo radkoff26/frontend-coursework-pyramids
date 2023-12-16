@@ -1,10 +1,19 @@
-import { generateRingElement, renderClock, renderGameField, renderGameOverPopup, renderHome, renderRecord, renderRingElement, renderRingOnPyramid } from "../game_renderer.js";
-import Store from "../store.js";
+import { 
+    generateRingElement, 
+    renderClock, 
+    renderGameField, 
+    renderGameOverPopup, 
+    renderHome, 
+    renderRecord, 
+    renderRingElement, 
+    renderRingOnPyramid 
+} from "../game_renderer.js";
+import Store from "../../store.js";
 import Ring from "../data/ring.js";
-import Subscriber from "../subscriber.js";
+import Subscriber from "../../subscriber.js";
 import { startTimeoutFrom, stopTimeout } from "../timeout.js";
 import stringifySeconds from "../time.js";
-import { saveRecord } from "../record.js";
+import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
 
 let gameStore = null
@@ -135,7 +144,7 @@ function render(state) {
     clockElement && (clockElement.innerText = stringifySeconds(state.timeLeft))
     if (redraw) {
         stopRequestAnimation()
-        document.body.innerHTML = ''
+        rerenderRoot()
         gameField = renderGameField(state.isGameOver)
         clockElement = renderClock(state.timeLeft)
         renderRecord(state.pyramidRings.length)
@@ -152,6 +161,13 @@ function render(state) {
         }
         redraw = false
     }
+}
+
+function rerenderRoot() {
+    document.body.removeChild(document.querySelector('#game'))
+    const rootElement = document.createElement('div')
+    rootElement.id = 'game'
+    document.body.insertAdjacentElement('afterbegin', rootElement)
 }
 
 function restartGame() {

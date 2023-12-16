@@ -1,5 +1,9 @@
 import stringifySeconds from "./time.js"
 
+function getRoot() {
+    return document.querySelector('#game')
+}
+
 export function renderGameField(isGameOver) {
     const game = document.createElement('div')
     game.classList.add('game')
@@ -19,7 +23,7 @@ export function renderGameField(isGameOver) {
     stand.appendChild(stick)
     pyramid.appendChild(stand)
     game.appendChild(pyramid)
-    document.body.insertAdjacentElement('beforeend', game)
+    getRoot().insertAdjacentElement('beforeend', game)
 
     return game
 }
@@ -52,7 +56,7 @@ export function renderGameOverPopup(record) {
     popup.appendChild(homeButton)
     popup.appendChild(restartButton)
     popupContainer.appendChild(popup)
-    document.body.appendChild(popupContainer)
+    getRoot().appendChild(popupContainer)
 
     return [homeButton, restartButton]
 }
@@ -63,7 +67,7 @@ export function renderClock(timeLeft) {
 
     clockElement.innerText = stringifySeconds(timeLeft)
 
-    document.body.appendChild(clockElement)
+    getRoot().appendChild(clockElement)
 
     return clockElement
 }
@@ -74,14 +78,14 @@ export function renderRecord(record) {
 
     recordElement.innerText = `Рекорд: ${record}`
 
-    document.body.appendChild(recordElement)
+    getRoot().appendChild(recordElement)
 }
 
 export function renderHome() {
     const homeElement = document.createElement('div')
     homeElement.classList.add('home')
 
-    document.body.appendChild(homeElement)
+    getRoot().appendChild(homeElement)
 
     return homeElement
 }

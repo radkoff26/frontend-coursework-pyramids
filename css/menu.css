@@ -1,3 +1,54 @@
+/* Authorization */
+.auth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.auth .auth-popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    height: fit-content;
+    width: fit-content;
+    padding: 24px 32px;
+    background-color: #fff;
+    border-radius: 16px;
+}
+
+.auth .auth-popup input {
+    height: fit-content;
+    width: 200px;
+    border: 1px solid #000;
+    outline: none;
+    padding: 8px;
+    color: #000;
+    border-radius: 16px;
+    font-size: 20px;
+}
+
+.auth .auth-popup button {
+    border: 1px solid #000;
+    border-radius: 16px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: #fff;
+    transition: .5s;
+}
+
+.auth .auth-popup button:hover {
+    background-color: #ccc;
+}
+
+/* Menu */
 .menu {
     display: flex;
     height: 100vh;
