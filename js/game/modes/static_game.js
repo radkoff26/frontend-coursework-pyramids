@@ -11,7 +11,7 @@ import Store from "../../store.js";
 import Ring from "../data/ring.js";
 import Subscriber from "../../subscriber.js";
 import { startTimeoutFrom, stopTimeout } from "../timeout.js";
-import stringifySeconds from "../time.js";
+import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
 
@@ -20,6 +20,7 @@ let clockElement = null
 let onBackPressed = null
 let redraw = true
 let stickElement = null
+let isResultSaved = false
 
 let movingRing = null
 
@@ -87,7 +88,9 @@ function closeGame() {
 }
 
 function stopGame() {
-    saveRecord(Mode.Static, gameStore.state.pyramidRings.length)
+    if (!isResultSaved) {
+        saveRecord(Mode.Static, gameStore.state.pyramidRings.length)
+    }
     stopTimeout()
     gameStore.unsubscribe(subscriber)
 }

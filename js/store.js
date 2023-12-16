@@ -1,9 +1,11 @@
+import { getGameTime } from "./storage.js"
+
 export default class Store {
     state = {
         floatingRings: [],
         pyramidRings: [],
         isGameOver: false,
-        timeLeft: 30
+        timeLeft: getGameTime()
     }
     #subscribers = []
     lastAddedRingId = -1

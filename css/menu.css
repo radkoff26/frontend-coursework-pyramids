@@ -22,6 +22,7 @@
     padding: 24px 32px;
     background-color: #fff;
     border-radius: 16px;
+    position: relative;
 }
 
 .auth .auth-popup input {
@@ -48,7 +49,46 @@
     background-color: #ccc;
 }
 
+.auth .auth-popup .close {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
 /* Menu */
+a.to-records {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    color: #000;
+    font-size: 24px;
+    border-bottom: 1px solid transparent;
+    transition: border-bottom .5s;
+}
+
+a.to-records:hover {
+    border-bottom-color: #000;
+}
+
+.relogin {
+    position: fixed;
+    right: 16px;
+    top: 16px;
+    border: 1px solid #000;
+    border-radius: 16px;
+    font-size: 20px;
+    transition: .5s;
+    background-color: #fff;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.relogin:hover {
+    background-color: #eee;
+}
+
 .menu {
     display: flex;
     height: 100vh;

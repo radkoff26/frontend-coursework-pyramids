@@ -13,7 +13,7 @@ export function renderMenu() {
     return menu
 }
 
-export function renderAuthorizationPopup() {
+export function renderAuthorizationPopup(isClosable) {
     const auth = document.createElement('div')
     auth.classList.add('auth')
 
@@ -25,6 +25,13 @@ export function renderAuthorizationPopup() {
     
     const button = document.createElement('button')
     button.innerText = 'Войти'
+
+    if (isClosable) {
+        const closeButton = document.createElement('div')
+        closeButton.classList.add('close')
+        closeButton.innerHTML = '&times;'
+        popup.appendChild(closeButton)
+    }
 
     popup.appendChild(input)
     popup.appendChild(button)
@@ -41,6 +48,15 @@ function generateMenuElement(recordStatic, recordDynamic, recordResizing) {
     const header = document.createElement('h1')
     header.innerText = 'Pyramids'
 
+    const recordsLink = document.createElement('a')
+    recordsLink.classList.add('to-records')
+    recordsLink.href = './pages/records.html'
+    recordsLink.innerText = 'Рекорды'
+
+    const relogin = document.createElement('div')
+    relogin.classList.add('relogin')
+    relogin.innerText = 'Сменить аккаунт'
+
     const staticGameButton = document.createElement('button')
     staticGameButton.setAttribute('data-mode', Mode.Static)
     staticGameButton.innerHTML = `Режим "Статический" <br> Рекорд: ${recordStatic}`
@@ -53,6 +69,8 @@ function generateMenuElement(recordStatic, recordDynamic, recordResizing) {
     resizingGameButton.setAttribute('data-mode', Mode.Resizing)
     resizingGameButton.innerHTML = `Режим "Увеличительный" <br> Рекорд: ${recordResizing}`
     
+    menu.appendChild(recordsLink)
+    menu.appendChild(relogin)
     menu.appendChild(header)
     menu.appendChild(staticGameButton)
     menu.appendChild(dynamicGameButton)

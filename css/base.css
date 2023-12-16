@@ -6,7 +6,32 @@
     font-family: Arial, sans-serif;
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .app {
     height: 100%;
     width: 100%;
+}
+
+.home {
+    height: 56px;
+    width: 56px;
+    position: fixed;
+    left: 8px;
+    bottom: 8px;
+    background-image: url("../images/home.svg");
+    background-size: contain;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: .5s;
+    background-color: #ccc;
+    border: 1px solid transparent;
+    z-index: 10;
+}
+
+.home:hover {
+    border-color: #000;
 }

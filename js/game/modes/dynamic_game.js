@@ -12,7 +12,7 @@ import Store from "../../store.js";
 import Ring from "../data/ring.js";
 import Subscriber from "../../subscriber.js";
 import { startTimeoutFrom, stopTimeout } from "../timeout.js";
-import stringifySeconds from "../time.js";
+import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
 
@@ -23,6 +23,7 @@ let animationFrame = null
 let intervalHandle = null
 let gameField = null
 let redraw = true
+let isResultSaved = false
 
 // Percents per frame
 const speed = 0.25
@@ -178,7 +179,9 @@ function stopRequestAnimation() {
 function stopGame() {
     intervalHandle && clearInterval(intervalHandle)
     stopRequestAnimation()
-    saveRecord(Mode.Dynamic, gameStore.state.pyramidRings.length)
+    if (!isResultSaved) {
+        saveRecord(Mode.Dynamic, gameStore.state.pyramidRings.length)
+    }
     stopTimeout()
     gameStore.unsubscribe(subscriber)
 }

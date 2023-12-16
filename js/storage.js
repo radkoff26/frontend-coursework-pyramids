@@ -9,3 +9,11 @@ export function saveSessionUser(user) {
 export function getSessionUser() {
     return localStorage.getItem('user') || 'Anonymous'
 }
+
+export function setGameTime(timeout) {
+    localStorage.setItem('timeout', timeout)
+}
+
+export function getGameTime() {
+    return localStorage.getItem('timeout') || 30
+}

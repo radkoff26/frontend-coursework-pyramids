@@ -1,4 +1,4 @@
-import stringifySeconds from "./time.js"
+import stringifySeconds from "../time.js"
 
 function getRoot() {
     return document.querySelector('#game')

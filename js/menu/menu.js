@@ -1,14 +1,10 @@
 import { renderAuthorizationPopup, renderMenu } from "./menu_renderer.js"
 import { Mode } from "../game/mode.js"
-import startDynamicGame from "../game/modes/dynamic_game.js"
-import startResizingGame from "../game/modes/resizing_game.js"
-import startStaticGame from "../game/modes/static_game.js"
-import Store from "../store.js"
 import { isUserLoggedIn, saveSessionUser } from "../storage.js"
 
-function toAuthorizationPopup() {
+function toAuthorizationPopup(isClosable) {
     rerenderApp()
-    const popup = renderAuthorizationPopup()
+    const popup = renderAuthorizationPopup(isClosable)
     const input = popup.querySelector('input')
     const button = popup.querySelector('button')
     button.addEventListener('click', () => {
@@ -20,6 +16,12 @@ function toAuthorizationPopup() {
             alert('Имя пользователя не может быть пустым!')
         }
     })
+    if (isClosable) {
+        const closeButton = popup.querySelector('.close')
+        closeButton.addEventListener('click', () => {
+            toMenu()
+        })
+    }
 }
 
 function toRules() {
@@ -29,6 +31,8 @@ function toRules() {
 function toMenu() {
     rerenderApp()
     const menu = renderMenu()
+    const reloginElement = menu.querySelector('.relogin')
+    reloginElement.addEventListener('click', () => toAuthorizationPopup(true))
     for (const child of menu.children) {
         child.addEventListener('click', e => {
             const mode = e.target.getAttribute('data-mode')
@@ -80,7 +84,7 @@ function initMenu() {
     if (isUserLoggedIn()) {
         toMenu()
     } else {
-        toAuthorizationPopup()
+        toAuthorizationPopup(false)
     }
 }
 

@@ -12,7 +12,7 @@ import Store from "../../store.js";
 import Ring from "../data/ring.js";
 import Subscriber from "../../subscriber.js";
 import { startTimeoutFrom, stopTimeout } from "../timeout.js";
-import stringifySeconds from "../time.js";
+import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
 
@@ -22,6 +22,7 @@ let onBackPressed = null
 let animationFrame = null
 let gameField = null
 let redraw = true
+let isResultSaved = false
 
 // Percents per frame
 let speed = 0.25
@@ -187,7 +188,9 @@ function stopRequestAnimation() {
 
 function stopGame() {
     stopRequestAnimation()
-    saveRecord(Mode.Resizing, gameStore.state.pyramidRings.length)
+    if (!isResultSaved) {
+        saveRecord(Mode.Resizing, gameStore.state.pyramidRings.length)
+    }
     stopTimeout()
     gameStore.unsubscribe(subscriber)
 }
