@@ -1,16 +1,10 @@
 let timeout = null
-let timeLeft = null
 let onTick = null
 
-export function startTimeoutFrom(duration, onTickCallback) {
+export function startTimeoutFrom(onTickCallback) {
     stopTimeout()
-    timeLeft = duration
     onTick = onTickCallback
     timeout = setTimeout(tick, 1000)
-}
-
-export function addTime(time) {
-    timeLeft += time
 }
 
 export function stopTimeout() {
@@ -19,11 +13,6 @@ export function stopTimeout() {
 }
 
 function tick() {
-    if (timeLeft === 0) {
-        stopTimeout()
-    } else {
-        onTick && onTick()
-        timeLeft--
-        timeout = setTimeout(tick, 1000)
-    }
+    onTick && onTick()
+    timeout = setTimeout(tick, 1000)
 }

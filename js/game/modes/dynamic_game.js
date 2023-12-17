@@ -15,6 +15,8 @@ import { startTimeoutFrom, stopTimeout } from "../timeout.js";
 import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
+import { Difficulty } from "../difficulty.js";
+import { getDifficultyMode } from "../../storage.js";
 
 let gameStore = null
 let clockElement = null
@@ -24,9 +26,12 @@ let intervalHandle = null
 let gameField = null
 let redraw = true
 let isResultSaved = false
+let difficulty = Difficulty.Easy
 
 // Percents per frame
-const speed = 0.25
+let speed = 0.25
+let pointsIncreaseStep = 1
+let timeIncreaseStep = 2
 const subscriber = new Subscriber(render)
 
 /**
@@ -36,15 +41,20 @@ const subscriber = new Subscriber(render)
 export default function startDynamicGame(store, onBackPressedCallback) {
     redraw = true
     gameStore = store
+    difficulty = getDifficultyMode()
+    speed = getSpeedByDifficulty()
+    timeIncreaseStep = getTimeIncreaseStepByDifficulty()
+    pointsIncreaseStep = getPointsIncreaseStepByDifficulty()
     onBackPressed = onBackPressedCallback
     generateNewRing()
-    startTimeoutFrom(store.state.timeLeft, () => {
+    startTimeoutFrom(() => {
         store.dispatch(state => {
             const timeLeft = state.timeLeft - 1
             console.log("Time left: ", timeLeft);
             const isGameOver = timeLeft === 0
             if (isGameOver) {
                 redraw = true
+                stopTimeout()
             }
             return {...state, timeLeft, isGameOver}
         })
@@ -52,6 +62,42 @@ export default function startDynamicGame(store, onBackPressedCallback) {
     store.subscribe(subscriber)
     startMovingRings()
     intervalHandle = setInterval(generateNewRing, 2000)
+}
+
+function getSpeedByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 0.2
+        case Difficulty.Medium:
+            return 0.35
+        case Difficulty.Hard:
+            return 0.5
+    }
+    return 0.35
+}
+
+function getPointsIncreaseStepByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 3
+        case Difficulty.Medium:
+            return 2
+        case Difficulty.Hard:
+            return 1
+    }
+    return 2
+}
+
+function getTimeIncreaseStepByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 4
+        case Difficulty.Medium:
+            return 3
+        case Difficulty.Hard:
+            return 2
+    }
+    return 3
 }
 
 function generateNewRing() {
@@ -139,7 +185,7 @@ function render(state) {
         rerenderRoot()
         gameField = renderGameField(state.isGameOver)
         clockElement = renderClock(state.timeLeft)
-        renderRecord(state.pyramidRings.length)
+        renderRecord(state.pyramidRings.length * pointsIncreaseStep)
         renderPyramid(state, gameField)
         renderHome().addEventListener('click', closeGame)
         if (state.isGameOver) {
@@ -181,7 +227,7 @@ function stopGame() {
     intervalHandle && clearInterval(intervalHandle)
     stopRequestAnimation()
     if (!isResultSaved) {
-        saveRecord(Mode.Dynamic, gameStore.state.pyramidRings.length)
+        saveRecord(Mode.Dynamic, gameStore.state.pyramidRings.length * pointsIncreaseStep)
     }
     stopTimeout()
     gameStore.unsubscribe(subscriber)
@@ -220,10 +266,11 @@ function putRingOnPyramid(ringId) {
             return {...state, isGameOver: true}
         }
         const pyramidRings = state.pyramidRings
+        const timeLeft = state.timeLeft + timeIncreaseStep
         pyramidRings.push(puttingRing)
         const floatingRings = state.floatingRings
         floatingRings.splice(ringIndex, 1)
-        return {...state, floatingRings, pyramidRings}
+        return {...state, floatingRings, pyramidRings, timeLeft}
     })
 }
 

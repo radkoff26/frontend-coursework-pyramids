@@ -16,6 +16,7 @@ import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
 import { getDifficultyMode } from "../../storage.js";
+import { Difficulty } from "../difficulty.js";
 
 let gameStore = null
 let clockElement = null
@@ -27,7 +28,11 @@ let isResultSaved = false
 let difficulty = null
 
 // Percents per frame
+let resizeStep = 0.5
 let speed = 0.25
+let pointsIncreaseStep = 1
+let timeIncreaseStep = 1
+let changeSizeAnimationFrameRequest = null
 const subscriber = new Subscriber(render)
 
 /**
@@ -38,9 +43,11 @@ export default function startResizingGame(store, onBackPressedCallback) {
     redraw = true
     difficulty = getDifficultyMode()
     gameStore = store
+    timeIncreaseStep = getTimeIncreaseStepByDifficulty()
+    pointsIncreaseStep = getPointsIncreaseStepByDifficulty()
     onBackPressed = onBackPressedCallback
     generateNewRing()
-    startTimeoutFrom(store.state.timeLeft, () => {
+    startTimeoutFrom(() => {
         store.dispatch(state => {
             const timeLeft = state.timeLeft - 1
             console.log("Time left: ", timeLeft);
@@ -51,26 +58,82 @@ export default function startResizingGame(store, onBackPressedCallback) {
             return {...state, timeLeft, isGameOver}
         })
     })
-    document.addEventListener('keyup', e => {
-        
+    document.addEventListener('keydown', e => {
+        stopSizeChangeRequest()
         if (gameStore && !gameStore.state.isGameOver) {
             if (e.key === 'ArrowUp') {
-                growAllRingsSize()
+                changeSizeAnimationFrameRequest = requestAnimationFrame(onGrowing)
             } else if (e.key === 'ArrowDown') {
-                shrinkAllRingsSize()
+                changeSizeAnimationFrameRequest = requestAnimationFrame(onShrinking)
             }
         }
-        
+    })
+    document.addEventListener('keyup', e => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            console.log('keyup');
+            stopSizeChangeRequest()
+        }
     })
     store.subscribe(subscriber)
     startMovingRing()
+}
+
+function stopSizeChangeRequest() {
+    changeSizeAnimationFrameRequest && cancelAnimationFrame(changeSizeAnimationFrameRequest)
+}
+
+function onGrowing() {
+    growAllRingsSize()
+    changeSizeAnimationFrameRequest = requestAnimationFrame(onGrowing)
+}
+
+function onShrinking() {
+    shrinkAllRingsSize()
+    changeSizeAnimationFrameRequest = requestAnimationFrame(onShrinking)
+}
+
+function getSpeedRangeByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return [0.2, 0.35]
+        case Difficulty.Medium:
+            return [0.35, 0.5]
+        case Difficulty.Hard:
+            return [0.5, 0.7]
+    }
+    return [0.35, 0.5]
+}
+
+function getPointsIncreaseStepByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 3
+        case Difficulty.Medium:
+            return 2
+        case Difficulty.Hard:
+            return 1
+    }
+    return 2
+}
+
+function getTimeIncreaseStepByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 3
+        case Difficulty.Medium:
+            return 2
+        case Difficulty.Hard:
+            return 1
+    }
+    return 2
 }
 
 function generateNewRing() {
     if (gameStore == null) {
         return
     }
-    speed = 0.1 + Math.random() * 0.4
+    const [min, max] = getSpeedRangeByDifficulty()
+    speed = min + Math.random() * max
     const floatingRings = gameStore.state.floatingRings
     // Generating a ring from 4.5% to 100% width
     let newWidth = 4.5 + Math.random() * 95.5
@@ -155,7 +218,7 @@ function render(state) {
         rerenderRoot()
         gameField = renderGameField(state.isGameOver)
         clockElement = renderClock(state.timeLeft)
-        renderRecord(state.pyramidRings.length)
+        renderRecord(state.pyramidRings.length * pointsIncreaseStep)
         renderPyramid(state, gameField)
         renderHome().addEventListener('click', closeGame)
         if (state.isGameOver) {
@@ -194,9 +257,10 @@ function stopRequestAnimation() {
 }
 
 function stopGame() {
+    stopSizeChangeRequest()
     stopRequestAnimation()
     if (!isResultSaved) {
-        saveRecord(Mode.Resizing, gameStore.state.pyramidRings.length)
+        saveRecord(Mode.Resizing, gameStore.state.pyramidRings.length * pointsIncreaseStep)
     }
     stopTimeout()
     gameStore.unsubscribe(subscriber)
@@ -239,11 +303,11 @@ function growRingSize(ringId) {
 }
 
 function growAllRingsSize() {
-    changeAllRingsSize(1)
+    changeAllRingsSize(resizeStep)
 }
 
 function shrinkAllRingsSize() {
-    changeAllRingsSize(-1)
+    changeAllRingsSize(-resizeStep)
 }
 
 function changeAllRingsSize(delta) {
@@ -269,11 +333,12 @@ function putRingOnPyramid(state, ringId) {
         redraw = true
         return {...state, isGameOver: true}
     }
+    const timeLeft = state.timeLeft + timeIncreaseStep
     const pyramidRings = state.pyramidRings
     pyramidRings.push(puttingRing)
     const floatingRings = state.floatingRings
     floatingRings.splice(ringIndex, 1)
-    return {...state, floatingRings, pyramidRings}
+    return {...state, floatingRings, pyramidRings, timeLeft}
 }
 
 function generateColorHex() {

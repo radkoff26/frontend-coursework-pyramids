@@ -14,6 +14,8 @@ import { startTimeoutFrom, stopTimeout } from "../timeout.js";
 import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
+import { Difficulty } from "../difficulty.js";
+import { getDifficultyMode } from "../../storage.js";
 
 let gameStore = null
 let clockElement = null
@@ -21,6 +23,10 @@ let onBackPressed = null
 let redraw = true
 let stickElement = null
 let isResultSaved = false
+
+let difficulty = Difficulty.Easy
+let pointsIncreaseStep = 1
+let timeIncreaseStep = 2
 
 let movingRing = null
 
@@ -33,11 +39,14 @@ const subscriber = new Subscriber(render)
 export default function startStaticGame(store, onBackPressedCallback) {
     redraw = true
     gameStore = store
+    difficulty = getDifficultyMode()
+    pointsIncreaseStep = getPointsIncreaseStepByDifficulty()
+    timeIncreaseStep = getTimeIncreaseStepByDifficulty()
     onBackPressed = onBackPressedCallback
     store.dispatch(state => {
         return {...state, floatingRings: generateInitialFloatingBatch()}
     })
-    startTimeoutFrom(store.state.timeLeft, () => {
+    startTimeoutFrom(() => {
         store.dispatch(state => {
             const timeLeft = state.timeLeft - 1
             const isGameOver = timeLeft === 0
@@ -50,6 +59,30 @@ export default function startStaticGame(store, onBackPressedCallback) {
     store.subscribe(subscriber)
 }
 
+function getPointsIncreaseStepByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 3
+        case Difficulty.Medium:
+            return 2
+        case Difficulty.Hard:
+            return 1
+    }
+    return 2
+}
+
+function getTimeIncreaseStepByDifficulty() {
+    switch (difficulty) {
+        case Difficulty.Easy:
+            return 4
+        case Difficulty.Medium:
+            return 3
+        case Difficulty.Hard:
+            return 2
+    }
+    return 3
+}
+
 function render(state) {
     clockElement && (clockElement.innerText = stringifySeconds(state.timeLeft))
     if (redraw) {
@@ -57,7 +90,7 @@ function render(state) {
         const gameField = renderGameField(state.isGameOver)
         clockElement = renderClock(state.timeLeft)
         stickElement = gameField.querySelector('.stick')
-        renderRecord(state.pyramidRings.length)
+        renderRecord(state.pyramidRings.length * pointsIncreaseStep)
         renderPyramid(state, gameField)
         renderFloatingRings(state, gameField)
         renderHome().addEventListener('click', closeGame)
@@ -89,7 +122,7 @@ function closeGame() {
 
 function stopGame() {
     if (!isResultSaved) {
-        saveRecord(Mode.Static, gameStore.state.pyramidRings.length)
+        saveRecord(Mode.Static, gameStore.state.pyramidRings.length * pointsIncreaseStep)
     }
     stopTimeout()
     gameStore.unsubscribe(subscriber)
@@ -196,10 +229,11 @@ function putRingOnPyramid(ringId) {
             stopTimeout()
             return {...state, isGameOver: true}
         }
+        const timeLeft = state.timeLeft + timeIncreaseStep
         const pyramidRings = state.pyramidRings
         pyramidRings.push(puttingRing)
         const floatingRings = generateNewFloatingBatch(pyramidRings)
-        return {...state, floatingRings, pyramidRings}
+        return {...state, floatingRings, pyramidRings, timeLeft}
     })
 }
 
