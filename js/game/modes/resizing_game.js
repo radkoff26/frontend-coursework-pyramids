@@ -15,6 +15,7 @@ import { startTimeoutFrom, stopTimeout } from "../timeout.js";
 import stringifySeconds from "../../time.js";
 import { saveRecord } from "../../record.js";
 import { Mode } from "../mode.js";
+import { getDifficultyMode } from "../../storage.js";
 
 let gameStore = null
 let clockElement = null
@@ -23,6 +24,7 @@ let animationFrame = null
 let gameField = null
 let redraw = true
 let isResultSaved = false
+let difficulty = null
 
 // Percents per frame
 let speed = 0.25
@@ -34,6 +36,7 @@ const subscriber = new Subscriber(render)
  */
 export default function startResizingGame(store, onBackPressedCallback) {
     redraw = true
+    difficulty = getDifficultyMode()
     gameStore = store
     onBackPressed = onBackPressedCallback
     generateNewRing()
@@ -49,11 +52,15 @@ export default function startResizingGame(store, onBackPressedCallback) {
         })
     })
     document.addEventListener('keyup', e => {
-        if (e.key === ' ') {
-            if (gameStore && !gameStore.state.isGameOver) {
+        
+        if (gameStore && !gameStore.state.isGameOver) {
+            if (e.key === 'ArrowUp') {
                 growAllRingsSize()
+            } else if (e.key === 'ArrowDown') {
+                shrinkAllRingsSize()
             }
         }
+        
     })
     store.subscribe(subscriber)
     startMovingRing()
@@ -65,8 +72,8 @@ function generateNewRing() {
     }
     speed = 0.1 + Math.random() * 0.4
     const floatingRings = gameStore.state.floatingRings
-    const lastRingWidth = floatingRings.length === 0 ? 100 : floatingRings[floatingRings.length - 1].width
-    let newWidth = 4.5 + Math.random() * (lastRingWidth - 4.5)
+    // Generating a ring from 4.5% to 100% width
+    let newWidth = 4.5 + Math.random() * 95.5
     const left = 50 - newWidth / 2
     gameStore.lastAddedRingId++
     const newRing = new Ring(
@@ -150,7 +157,6 @@ function render(state) {
         clockElement = renderClock(state.timeLeft)
         renderRecord(state.pyramidRings.length)
         renderPyramid(state, gameField)
-        renderFloatingRings(state, gameField)
         renderHome().addEventListener('click', closeGame)
         if (state.isGameOver) {
             stopGame()
@@ -158,6 +164,7 @@ function render(state) {
             homeButton.addEventListener('click', closeGame)
             restartButton.addEventListener('click', restartGame)
         } else {
+            renderFloatingRings(state, gameField)
             startMovingRing()
         }
         redraw = false
@@ -220,7 +227,11 @@ function renderFloatingRings(state, gameField) {
 function growRingSize(ringId) {
     const floatingRings = gameStore.state.floatingRings
     const puttingRing = floatingRings.find(val => val.id === ringId)
-    puttingRing.width += 1
+    const diff = puttingRing.width + 1
+    if (diff > 100) {
+        return
+    }
+    puttingRing.width = diff
     puttingRing.left = 50 - puttingRing.width / 2
     const ringElement = document.querySelector(`[data-index="${ringId}"`)
     ringElement.style.width = `${puttingRing.width}%`
@@ -228,13 +239,24 @@ function growRingSize(ringId) {
 }
 
 function growAllRingsSize() {
+    changeAllRingsSize(1)
+}
+
+function shrinkAllRingsSize() {
+    changeAllRingsSize(-1)
+}
+
+function changeAllRingsSize(delta) {
     const floatingRings = gameStore.state.floatingRings
     floatingRings.forEach(val => {
-        val.width += 1
-        val.left = 50 - val.width / 2
-        const ringElement = document.querySelector(`[data-index="${val.id}"`)
-        ringElement.style.width = `${val.width}%`
-        ringElement.style.left = `${val.left}%`
+        const diff = val.width + delta
+        if (diff >= 4.5 && diff <= 100) {
+            val.width = diff
+            val.left = 50 - val.width / 2
+            const ringElement = document.querySelector(`[data-index="${val.id}"`)
+            ringElement.style.width = `${val.width}%`
+            ringElement.style.left = `${val.left}%`
+        }
     })
 }
 
