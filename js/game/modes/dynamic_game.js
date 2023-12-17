@@ -141,15 +141,16 @@ function render(state) {
         clockElement = renderClock(state.timeLeft)
         renderRecord(state.pyramidRings.length)
         renderPyramid(state, gameField)
-        renderFloatingRings(state, gameField)
         renderHome().addEventListener('click', closeGame)
         if (state.isGameOver) {
             stopGame()
             const [homeButton, restartButton] = renderGameOverPopup(state.pyramidRings.length)
             homeButton.addEventListener('click', closeGame)
             restartButton.addEventListener('click', restartGame)
+        } else {
+            renderFloatingRings(state, gameField)
+            startMovingRings()
         }
-        startMovingRings()
         redraw = false
     }
 }

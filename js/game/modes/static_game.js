@@ -204,29 +204,21 @@ function putRingOnPyramid(ringId) {
 }
 
 function generateInitialFloatingBatch() {
-    return mapRingSizesToRings([20, 75])
+    return mapRingSizesToRings([45, 45])
 }
 
 function generateNewFloatingBatch(pyramidRings) {
-    const peekWidth = pyramidRings.length === 0 ? 40 : pyramidRings[pyramidRings.length - 1].width
-    
-    let newWidth
-    if (peekWidth >= 4.5 && peekWidth < 5.5) {
-        newWidth = peekWidth
-    } else {
-        newWidth = peekWidth - 1
-    }
-    const restPlace = 92 - newWidth
-    const randomRatio = 0.25 + Math.random() * 0.15
-
-    const widthForSuitable = newWidth
-    const widthForSmaller = restPlace * randomRatio
-    const widthForBigger = restPlace * (1 - randomRatio)
+    const peekWidth = pyramidRings.length === 0 ? 50 : pyramidRings[pyramidRings.length - 1].width
 
     const ringsWidths = []
-    ringsWidths.push(widthForSuitable)
-    ringsWidths.push(widthForBigger)
-    ringsWidths.push(widthForSmaller)
+    if (peekWidth * 2 + 3 < 66) {
+        ringsWidths.push(peekWidth)
+        ringsWidths.push(peekWidth + 1)
+        ringsWidths.push(peekWidth - 1)
+    } else {
+        ringsWidths.push(peekWidth + 1)
+        ringsWidths.push(peekWidth - 1)
+    }
     shuffle(ringsWidths)
 
     return mapRingSizesToRings(ringsWidths)
