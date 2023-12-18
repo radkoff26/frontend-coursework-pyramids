@@ -91,13 +91,13 @@ function getPointsIncreaseStepByDifficulty() {
 function getTimeIncreaseStepByDifficulty() {
     switch (difficulty) {
         case Difficulty.Easy:
-            return 4
-        case Difficulty.Medium:
-            return 3
-        case Difficulty.Hard:
             return 2
+        case Difficulty.Medium:
+            return 1
+        case Difficulty.Hard:
+            return 0.5
     }
-    return 3
+    return 1
 }
 
 function generateNewRing() {
@@ -154,10 +154,8 @@ function moveRings() {
         }
     }
     if (redraw) {
-        gameStore.dispatch(state => {
-            state.floatingRings = state.floatingRings.filter(ring => ring.top < 120)
-            return state
-        })
+        gameStore.state.floatingRings = floatingRings.filter(ring => ring.top < 120)
+        redraw = false
     }
     rerenderFloatingRings(floatingRings)
     startMovingRings()
@@ -167,6 +165,7 @@ function rerenderFloatingRings(floatingRings) {
     if (gameField == null) {
         return
     }
+    const removable = []
     for (const child of gameField.children) {
         const attr = child.getAttribute('data-index')
         if (attr == null) {
@@ -174,8 +173,13 @@ function rerenderFloatingRings(floatingRings) {
         }
         const index = Number.parseInt(attr)
         const ring = floatingRings.find(val => val.id === index)
-        child.style.top = `${ring.top}%`
+        if (ring) {
+            child.style.top = `${ring.top}%`
+        } else {
+            removable.push(child)
+        }
     }
+    removable.forEach(child => gameField.removeChild(child))
 }
 
 function render(state) {
@@ -266,7 +270,8 @@ function putRingOnPyramid(ringId) {
             return {...state, isGameOver: true}
         }
         const pyramidRings = state.pyramidRings
-        const timeLeft = state.timeLeft + timeIncreaseStep
+        const timeLeft = Number.parseInt(state.timeLeft) + Number.parseInt(timeIncreaseStep)
+        console.log("timeLeft", timeLeft);
         pyramidRings.push(puttingRing)
         const floatingRings = state.floatingRings
         floatingRings.splice(ringIndex, 1)

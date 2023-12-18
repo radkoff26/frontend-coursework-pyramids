@@ -99,7 +99,7 @@ function getSpeedRangeByDifficulty() {
         case Difficulty.Medium:
             return [0.35, 0.5]
         case Difficulty.Hard:
-            return [0.5, 0.7]
+            return [0.4, 0.55]
     }
     return [0.35, 0.5]
 }
@@ -119,13 +119,13 @@ function getPointsIncreaseStepByDifficulty() {
 function getTimeIncreaseStepByDifficulty() {
     switch (difficulty) {
         case Difficulty.Easy:
-            return 3
-        case Difficulty.Medium:
             return 2
-        case Difficulty.Hard:
+        case Difficulty.Medium:
             return 1
+        case Difficulty.Hard:
+            return 0.5
     }
-    return 2
+    return 1
 }
 
 function generateNewRing() {

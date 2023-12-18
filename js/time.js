@@ -1,5 +1,6 @@
-export default function stringifySeconds(seconds) {
+export default function stringifySeconds(s) {
     let time
+    const seconds = Number.parseInt(s)
     if (seconds >= 3600) {
         time = '59:59'
     } else {

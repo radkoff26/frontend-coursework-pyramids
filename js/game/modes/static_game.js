@@ -74,13 +74,13 @@ function getPointsIncreaseStepByDifficulty() {
 function getTimeIncreaseStepByDifficulty() {
     switch (difficulty) {
         case Difficulty.Easy:
-            return 4
-        case Difficulty.Medium:
-            return 3
-        case Difficulty.Hard:
             return 2
+        case Difficulty.Medium:
+            return 1
+        case Difficulty.Hard:
+            return 0.5
     }
-    return 3
+    return 1
 }
 
 function render(state) {
